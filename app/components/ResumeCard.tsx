@@ -2,21 +2,24 @@ import {Link} from "react-router";
 import ScoreCircle from "~/components/ScoreCircle";
 import {useEffect, useState} from "react";
 import {usePuterStore} from "~/lib/puter";
+import { useFsReadQuery } from "~/lib/puterApiSlice";
 
 const ResumeCard = ({resume}: { resume: Resume }) => {
     const {fs} = usePuterStore()
+    const {data: blob} = useFsReadQuery(resume.imagePath)
     const [resumeUrl, setResumeUrl] = useState('')
 
     useEffect(() => {
-        const loadResume = async () => {
-            const blob = await fs.read(resume.imagePath)
-            if (!blob) return
-            let url = URL.createObjectURL(blob)
-            setResumeUrl(url)
-        }
+    if (!blob) return;
 
-        loadResume()
-    }, [resume.imagePath]);
+    const url = URL.createObjectURL(blob);
+    setResumeUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url); 
+    };
+  }, [blob]);
+
     return <Link to={`/resume/${resume.id}`} className="resume-card animate-in fade-in duration-1000">
         <div className="resume-card-header">
             <div className="flex flex-col gap-2">

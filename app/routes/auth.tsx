@@ -1,6 +1,9 @@
 import {usePuterStore} from "~/lib/puter";
 import {useEffect} from "react";
 import {useLocation, useNavigate} from "react-router";
+import { useSelector } from "react-redux";
+import type { RootState } from "~/lib/store";
+import { useSignInMutation, useSignOutMutation } from "~/lib/puterApiSlice";
 
 export const meta = () => ([
     {title: 'Resumind | Auth'},
@@ -8,7 +11,10 @@ export const meta = () => ([
 ])
 
 const Auth = () => {
-    const {isLoading, auth} = usePuterStore()
+    // const {isLoading, auth} = usePuterStore()
+    const auth = useSelector((state: RootState) => state.puter.auth)
+    const [signIn, {isLoading: isSignInLoading}] = useSignInMutation()
+    const [signOut, {isLoading: isSignOutLoading}] = useSignOutMutation()
     const location = useLocation()
     const next = location.search.split('next=')[1]
     const navigate = useNavigate()
@@ -25,16 +31,16 @@ const Auth = () => {
                     <h2>Log In To Continue Your Job Journey</h2>
                 </div>
                 <div>
-                    {isLoading ? (
+                    {(isSignInLoading || isSignOutLoading ) ? (
                         <button className="auth-button animate-pulse">
                             <p>Signing you in ...</p>
                         </button>
                     ) : auth.isAuthenticated ? (
-                        <button className="auth-button" onClick={auth.signOut}>
+                        <button className="auth-button" onClick={() => signOut()}>
                             <p>Log Out</p>
                         </button>
                     ) : (
-                        <button className="auth-button" onClick={auth.signIn}>
+                        <button className="auth-button" onClick={() => signIn()}>
                             <p>Log In</p>
                         </button>
                     )}

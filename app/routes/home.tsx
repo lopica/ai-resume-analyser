@@ -4,6 +4,9 @@ import ResumeCard from "~/components/ResumeCard";
 import {usePuterStore} from "~/lib/puter";
 import {Link, useNavigate} from "react-router";
 import {useEffect, useState} from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "~/lib/store";
+import { useKvListQuery } from "~/lib/puterApiSlice";
 
 export function meta({}: Route.MetaArgs) {
     return [
@@ -13,31 +16,36 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-    const {auth, kv} = usePuterStore()
+    // const {auth, kv} = usePuterStore()
+    const auth = useSelector((state: RootState) => state.puter.auth)
+    const {data, isFetching } = useKvListQuery({ pattern: "resume:*", returnValues: true }) 
     const navigate = useNavigate()
     const [resumes, setResumes] = useState<Resume[]>([])
     const [loadingResumes, setLoadingResumes] = useState(false)
 
     useEffect(() => {
-        if (!auth.isAuthenticated) navigate('/auth?next=/')
+        if (!auth.isAuthenticated) {
+            setResumes([])
+            navigate('/auth?next=/')
+        }
     }, [auth.isAuthenticated]);
 
     useEffect(() => {
         const loadResumes = async () => {
             setLoadingResumes(true)
 
-            const resumes = (await kv.list('resume:*', true)) as KVItem[]
+            // const resumes = (await kv.list('resume:*', true)) as KVItem[]
 
-            const parsedResumes = resumes?.map(resume => JSON.parse(resume.value) as Resume)
+            const parsedResumes = (data as KVItem[])?.map(resume => JSON.parse(resume.value) as Resume)
 
             console.log(parsedResumes)
 
-            setResumes(parsedResumes)
+            setResumes(parsedResumes || [])
             setLoadingResumes(false)
         }
 
-        loadResumes()
-    }, []);
+        if(!isFetching) loadResumes()
+    }, [isFetching]);
 
     return <main className="bg-[url('/images/bg-main.svg')]">
         <Navbar/>

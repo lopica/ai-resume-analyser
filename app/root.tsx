@@ -11,6 +11,9 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import {usePuterStore} from "~/lib/puter";
 import {useEffect} from "react";
+import { Provider } from "react-redux";
+import { store } from "./lib/store";
+import { useInitMutation } from "./lib/puterApiSlice";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,11 +29,11 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const {init} = usePuterStore()
+  // const {init} = usePuterStore()
 
-  useEffect(() => {
-    init()
-  }, [init]);
+  // useEffect(() => {
+  //   init()
+  // }, [init]);
 
   return (
     <html lang="en">
@@ -42,7 +45,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
       <script src="https://js.puter.com/v2/"></script>
-      {children}
+      <Provider store={store}>
+          <InitComponent /> {/* Hook gọi sau khi Provider đã bọc */}
+          {children}
+          ...
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -52,6 +59,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+function InitComponent() {
+  const [init] = useInitMutation();
+  useEffect(() => {
+    init();
+  }, [init]);
+  return null;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
