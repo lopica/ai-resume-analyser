@@ -5,20 +5,19 @@ import {usePuterStore} from "~/lib/puter";
 import { useFsReadQuery } from "~/lib/puterApiSlice";
 
 const ResumeCard = ({resume}: { resume: Resume }) => {
-    const {fs} = usePuterStore()
-    const {data: blob} = useFsReadQuery(resume.imagePath)
+    // const {fs} = usePuterStore()
+    const {data: url} = useFsReadQuery({path: resume.imagePath})
     const [resumeUrl, setResumeUrl] = useState('')
 
     useEffect(() => {
-    if (!blob) return;
+    if (!url) return;
 
-    const url = URL.createObjectURL(blob);
     setResumeUrl(url);
 
-    return () => {
-      URL.revokeObjectURL(url); 
-    };
-  }, [blob]);
+    // return () => {
+    //   URL.revokeObjectURL(url); 
+    // };
+  }, [url]);
 
     return <Link to={`/resume/${resume.id}`} className="resume-card animate-in fade-in duration-1000">
         <div className="resume-card-header">

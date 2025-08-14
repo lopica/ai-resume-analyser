@@ -5,7 +5,7 @@ import { checkAuthStatus, setPuter, setUser } from "./puterSlice";
 export const puterApiSlice = createApi({
   reducerPath: "puterApi",
   baseQuery: () => ({ data: null }),
-  tagTypes: ["AuthStatus", "FileSystem", "KeyValue"],
+  tagTypes: ["AuthStatus"],
   endpoints: (builder) => ({
     // Auth endpoints
     signIn: builder.mutation<void, void>({
@@ -120,8 +120,8 @@ export const puterApiSlice = createApi({
       },
     }),
 
-    fsRead: builder.query<Blob, string>({
-      queryFn: async (path) => {
+    fsRead: builder.query<string, {path: string, isPdf?: boolean}>({
+      queryFn: async ({path, isPdf = false}) => {
         const puter = getPuter();
         if (!puter) {
           return { error: "Puter.js not available" };
@@ -129,7 +129,14 @@ export const puterApiSlice = createApi({
 
         try {
           const result = await puter.fs.read(path);
-          return { data: result };
+          let url
+          if (isPdf) {
+            const pdfBlob = new Blob([result], { type: "application/pdf" });
+            url = URL.createObjectURL(pdfBlob);
+          } else {
+            url = URL.createObjectURL(result)
+          }
+          return { data: url };
         } catch (err) {
           const msg = err instanceof Error ? err.message : "Read failed";
           return { error: msg };

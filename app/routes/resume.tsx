@@ -30,17 +30,17 @@ const Resume = () => {
   
   // Get resume file blob
   const { 
-    data: resumeBlob, 
+    data: resumeBlobUrl, 
     isFetching: isLoadingResume 
-  } = useFsReadQuery(parsedResumeData?.resumePath, {
+  } = useFsReadQuery({path: parsedResumeData?.resumePath, isPdf: true}, {
     skip: !parsedResumeData?.resumePath
   });
 
   // Get image file blob
   const { 
-    data: imageBlob, 
+    data: imageBlobUrl, 
     isFetching: isLoadingImage 
-  } = useFsReadQuery(parsedResumeData?.imagePath, {
+  } = useFsReadQuery({path: parsedResumeData?.imagePath}, {
     skip: !parsedResumeData?.imagePath
   });
 
@@ -61,38 +61,33 @@ const Resume = () => {
 
   // Process resume blob when it loads
   useEffect(() => {
-    if (resumeBlob) {
-      const pdfBlob = new Blob([resumeBlob], { type: "application/pdf" });
-      const url = URL.createObjectURL(pdfBlob);
-      setResumeURL(url);
+    if (resumeBlobUrl && resumeUrl !== resumeBlobUrl) {
+      setResumeURL(resumeBlobUrl);
 
       // Cleanup function to revoke the URL when component unmounts
-      return () => {
-        URL.revokeObjectURL(url);
-      };
+      // return () => {
+      //   URL.revokeObjectURL(resumeBlobUrl);
+      // };
     }
-  }, [isLoadingResume]);
+  }, [resumeBlobUrl]);
 
   // Process image blob when it loads
   useEffect(() => {
-    if (imageBlob) {
-      const url = URL.createObjectURL(imageBlob);
-      setImageUrl(url);
+    if (imageBlobUrl && imageUrl !== imageBlobUrl) {
+      setImageUrl(imageBlobUrl);
 
       // Cleanup function to revoke the URL when component unmounts
-      return () => {
-        URL.revokeObjectURL(url);
-      };
+      // return () => {
+      //   URL.revokeObjectURL(imageBlobUrl);
+      // };
     }
-  }, [isLoadingImage]);
+  }, [imageBlobUrl]);
 
   // Set feedback when metadata loads
   useEffect(() => {
     if (parsedResumeData?.feedback) {
       setFeedback(parsedResumeData.feedback);
       console.log({ 
-        resumeUrl, 
-        imageUrl, 
         feedback: parsedResumeData.feedback 
       });
     }
