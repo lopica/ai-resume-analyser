@@ -48,7 +48,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Provider store={store}>
           <InitComponent /> {/* Hook gọi sau khi Provider đã bọc */}
           {children}
-          ...
         </Provider>
         <ScrollRestoration />
         <Scripts />

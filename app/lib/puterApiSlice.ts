@@ -46,7 +46,7 @@ export const puterApiSlice = createApi({
       invalidatesTags: ["AuthStatus"],
     }),
 
-    refreshUser: builder.mutation<void, void>({
+    refreshUser: builder.query<void, void>({
       queryFn: async (_, { dispatch }) => {
         const puter = getPuter();
         if (!puter) {
@@ -196,7 +196,7 @@ export const puterApiSlice = createApi({
     }),
 
     // AI endpoints
-    aiChat: builder.query<
+    aiChat: builder.mutation<
       AIResponse,
       {
         prompt: string | ChatMessage[];
@@ -263,7 +263,7 @@ export const puterApiSlice = createApi({
       }
     ),
 
-    aiImg2txt: builder.query<
+    aiImg2txt: builder.mutation<
       string,
       { image: string | File | Blob; testMode?: boolean }
     >({
@@ -381,7 +381,7 @@ export const {
   // Auth hooks
   useSignInMutation,
   useSignOutMutation,
-  useRefreshUserMutation,
+  useRefreshUserQuery,
   useInitMutation,
 
   // File system hooks
@@ -392,9 +392,9 @@ export const {
   useFsReadirQuery,
 
   // AI hooks
-  useAiChatQuery,
+  useAiChatMutation,
   useAiFeedbackMutation,
-  useAiImg2txtQuery,
+  useAiImg2txtMutation,
 
   // KV hooks
   useKvGetQuery,
