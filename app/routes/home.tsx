@@ -1,14 +1,12 @@
-import type {Route} from "./+types/home";
 import Navbar from "~/components/Navbar";
 import ResumeCard from "~/components/ResumeCard";
-import {usePuterStore} from "~/lib/puter";
 import {Link, useNavigate} from "react-router";
 import {useEffect, useState} from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "~/lib/store";
 import { useKvListQuery } from "~/lib/puterApiSlice";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         {title: "Resumind"},
         {name: "description", content: "Smart feedback for your dream job!"},
@@ -16,7 +14,6 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-    // const {auth, kv} = usePuterStore()
     const auth = useSelector((state: RootState) => state.puter.auth)
     const {data, isFetching } = useKvListQuery({ pattern: "resume:*", returnValues: true }) 
     const navigate = useNavigate()

@@ -1,4 +1,3 @@
-import {usePuterStore} from "~/lib/puter";
 import {useEffect} from "react";
 import {useLocation, useNavigate} from "react-router";
 import { useSelector } from "react-redux";
@@ -11,7 +10,6 @@ export const meta = () => ([
 ])
 
 const Auth = () => {
-    // const {isLoading, auth} = usePuterStore()
     const auth = useSelector((state: RootState) => state.puter.auth)
     const [signIn, {isLoading: isSignInLoading}] = useSignInMutation()
     const [signOut, {isLoading: isSignOutLoading}] = useSignOutMutation()

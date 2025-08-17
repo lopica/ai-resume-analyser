@@ -9,7 +9,6 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import {usePuterStore} from "~/lib/puter";
 import {useEffect} from "react";
 import { Provider } from "react-redux";
 import { store } from "./lib/store";
@@ -29,12 +28,6 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  // const {init} = usePuterStore()
-
-  // useEffect(() => {
-  //   init()
-  // }, [init]);
-
   return (
     <html lang="en">
       <head>

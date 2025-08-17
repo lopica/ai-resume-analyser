@@ -36,7 +36,6 @@ const Resume = () => {
     skip: !parsedResumeData?.resumePath
   });
 
-  // Get image file blob
   const { 
     data: imageBlobUrl, 
     isFetching: isLoadingImage 
@@ -51,23 +50,15 @@ const Resume = () => {
 
   const isLoadingAny = isLoadingMetadata || isLoadingResume || isLoadingImage;
 
-
-  // Handle authentication redirect
   useEffect(() => {
     if (!isLoadingAny && !auth.isAuthenticated) {
       navigate(`/auth?next=/resume/${id}`);
     }
   }, [isLoadingAny, auth.isAuthenticated, navigate, id]);
 
-  // Process resume blob when it loads
   useEffect(() => {
     if (resumeBlobUrl && resumeUrl !== resumeBlobUrl) {
       setResumeURL(resumeBlobUrl);
-
-      // Cleanup function to revoke the URL when component unmounts
-      // return () => {
-      //   URL.revokeObjectURL(resumeBlobUrl);
-      // };
     }
   }, [resumeBlobUrl]);
 
@@ -75,15 +66,9 @@ const Resume = () => {
   useEffect(() => {
     if (imageBlobUrl && imageUrl !== imageBlobUrl) {
       setImageUrl(imageBlobUrl);
-
-      // Cleanup function to revoke the URL when component unmounts
-      // return () => {
-      //   URL.revokeObjectURL(imageBlobUrl);
-      // };
     }
   }, [imageBlobUrl]);
 
-  // Set feedback when metadata loads
   useEffect(() => {
     if (parsedResumeData?.feedback) {
       setFeedback(parsedResumeData.feedback);
@@ -93,9 +78,7 @@ const Resume = () => {
     }
   }, [isLoadingMetadata]);
 
-  // Show loading state while any data is being fetched
 
-  // Handle errors
   if (metadataError) {
     return (
       <main className="!pt-0">
