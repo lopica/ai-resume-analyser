@@ -71,13 +71,13 @@ export default defineConfig({
     // },
   ],
 
-  // Use existing dev server (start manually with: npm run dev)
-  // webServer: {
-  //   command: 'npm run dev',
-  //   port: 5175,
-  //   reuseExistingServer: !process.env.CI,
-  //   timeout: 120000,
-  // },
+  // Auto-start dev server for testing
+  webServer: {
+    command: 'npm run dev',
+    port: 5173,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
   
   // Optimized global timeout for faster execution
   timeout: 60000, // 1 minute per test (reduced from 5 minutes)
