@@ -4,7 +4,7 @@ A modern, production-ready application for analyzing resumes using AI, built wit
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
-## Features
+## Features App
 
 - 🚀 Server-side rendering
 - ⚡️ Hot Module Replacement (HMR)
