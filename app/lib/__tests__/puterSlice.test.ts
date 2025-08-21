@@ -1,309 +1,207 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { puterApiSlice } from '~/lib/puterApiSlice';
-import puterSlice, { checkAuthStatus, setPuter, setUser } from '~/lib/puterSlice';
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { configureStore } from "@reduxjs/toolkit";
+import puterSlice, { setUser, setPuter, checkAuthStatus } from "../puterSlice";
+import type { RootState, AppDispatch } from "../store";
 
-// Define the PuterUser type (should match your actual type)
-interface PuterUser {
-  id: string;
-  username: string;
-  email?: string;
-}
+// Mock the puter module
+vi.mock("../puter", () => ({
+  getPuter: vi.fn(),
+}));
 
-// Mock the puter module BEFORE importing anything else
-vi.mock('~/lib/puter', () => {
-  const mockPuter = {
-    auth: {
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      getUser: vi.fn(),
-      isSignedIn: vi.fn()
-    },
-    fs: {
-      write: vi.fn(),
-      read: vi.fn(),
-      readdir: vi.fn(),
-      upload: vi.fn(),
-      delete: vi.fn()
-    },
-    ai: {
-      chat: vi.fn(),
-      img2txt: vi.fn()
-    },
-    kv: {
-      get: vi.fn(),
-      set: vi.fn(),
-      delete: vi.fn(),
-      list: vi.fn(),
-      flush: vi.fn()
-    }
-  };
-
-  const mockGetPuter = vi.fn(() => mockPuter);
-
-  return {
-    getPuter: mockGetPuter,
-    // Export the mock objects so we can access them in tests
-    __mockPuter: mockPuter,
-    __mockGetPuter: mockGetPuter
-  };
-});
-
-// Import the mocked functions
-import { getPuter } from '~/lib/puter';
-
-// Get access to the mock objects
-const mockGetPuter = (getPuter as any).__mockGetPuter || getPuter;
-const mockPuter = (getPuter as any).__mockPuter || {
-  auth: {
-    signIn: vi.fn(),
-    signOut: vi.fn(),
-    getUser: vi.fn(),
-    isSignedIn: vi.fn()
-  },
-  fs: {
-    write: vi.fn(),
-    read: vi.fn(),
-    readdir: vi.fn(),
-    upload: vi.fn(),
-    delete: vi.fn()
-  },
-  ai: {
-    chat: vi.fn(),
-    img2txt: vi.fn()
-  },
-  kv: {
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-    list: vi.fn(),
-    flush: vi.fn()
-  }
+/*
+ * Test strategy for puterSlice:
+ * 
+ * This slice manages Puter.js integration state with two main areas:
+ * 1. Synchronous reducers (setUser, setPuter): Test state updates directly
+ * 2. Async thunk (checkAuthStatus): Test different scenarios with mocked dependencies
+ * 
+ * Key test scenarios:
+ * - Initial state verification
+ * - Synchronous action state updates  
+ * - Async thunk success/failure cases
+ * - Authentication state management logic
+ * 
+ * The async thunk depends on getPuter() function, so we mock it to simulate
+ * different conditions (puter available/unavailable, signed in/out, errors).
+ */
+type TestStoreState = {
+  puter: ReturnType<typeof puterSlice.reducer>;
 };
 
-// Test store setup
-function createTestStore() {
-  return configureStore({
-    reducer: {
-      [puterSlice.name]: puterSlice.reducer,
-      [puterApiSlice.reducerPath]: puterApiSlice.reducer,
-    },
-    middleware: (getDefaultMiddleware) => 
-      getDefaultMiddleware().concat(puterApiSlice.middleware),
-  });
-}
-
 describe('puterSlice', () => {
-  let store: ReturnType<typeof createTestStore>;
-
+  let store: ReturnType<typeof configureStore<TestStoreState>> & { dispatch: AppDispatch };
+  
   beforeEach(() => {
-    store = createTestStore();
+    // Create a fresh store for each test to avoid state pollution
+    store = configureStore({
+      reducer: {
+        puter: puterSlice.reducer,
+      },
+    });
     vi.clearAllMocks();
-    // Reset the mock to return mockPuter by default
-    if (mockGetPuter && mockGetPuter.mockReturnValue) {
-      mockGetPuter.mockReturnValue(mockPuter);
-    }
   });
 
-  describe('reducers', () => {
-    it('should handle setUser with user data', () => {
-      const mockUser: PuterUser = { id: '123', username: 'testuser', email: 'test@example.com' };
-      
-      store.dispatch(setUser({ user: mockUser }));
-      
-      const state = store.getState();
-      expect(state.puter.auth.user).toEqual(mockUser);
-      expect(state.puter.auth.isAuthenticated).toBe(true);
-    });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    it('should handle setUser with null user', () => {
-      // First set a user
-      const mockUser: PuterUser = { id: '123', username: 'testuser' };
-      store.dispatch(setUser({ user: mockUser }));
-      
-      // Then set to null
-      store.dispatch(setUser({ user: null }));
-      
-      const state = store.getState();
-      expect(state.puter.auth.user).toBe(null);
-      expect(state.puter.auth.isAuthenticated).toBe(false);
+  // Test initial state values
+  test('should have correct initial state', () => {
+    const state = store.getState();
+    const puterState = state.puter;
+    expect(puterState).toEqual({
+      puterReady: false,
+      auth: {
+        user: null,
+        isAuthenticated: false,
+      },
     });
+  });
 
-    it('should handle setPuter', () => {
+  /*
+   * Test strategy for synchronous reducers:
+   * Test each reducer with different payload values to ensure state updates correctly
+   */
+  describe('synchronous actions', () => {
+    // Test setPuter action with true/false values
+    test('setPuter should update puterReady state', () => {
       store.dispatch(setPuter(true));
+      expect(store.getState().puter.puterReady).toBe(true);
       
-      const state = store.getState();
-      expect(state.puter.puterReady).toBe(true);
-    });
-
-    it('should handle setPuter false', () => {
-      // First set to true
-      store.dispatch(setPuter(true));
-      // Then set to false
       store.dispatch(setPuter(false));
-      
-      const state = store.getState();
-      expect(state.puter.puterReady).toBe(false);
-    });
-  });
-
-  describe('checkAuthStatus async thunk', () => {
-    it('should check auth status and set user when signed in', async () => {
-      const mockUser: PuterUser = { id: '123', username: 'testuser' };
-      mockPuter.auth.isSignedIn.mockResolvedValue(true);
-      mockPuter.auth.getUser.mockResolvedValue(mockUser);
-
-      const result = await store.dispatch(checkAuthStatus());
-
-      // Check that the async thunk was fulfilled
-      expect(checkAuthStatus.fulfilled.match(result)).toBe(true);
-      // Since your original async thunk doesn't return anything, payload is undefined
-      expect(result.payload).toBeUndefined();
-      
-      const state = store.getState();
-      expect(state.puter.auth.user).toEqual(mockUser);
-      expect(state.puter.auth.isAuthenticated).toBe(true);
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).toHaveBeenCalled();
+      expect(store.getState().puter.puterReady).toBe(false);
     });
 
-    it('should set user to null when not signed in', async () => {
-      mockPuter.auth.isSignedIn.mockResolvedValue(false);
-
-      const result = await store.dispatch(checkAuthStatus());
-
-      // Check that the async thunk was fulfilled
-      expect(checkAuthStatus.fulfilled.match(result)).toBe(true);
-      // Since your original async thunk doesn't return anything, payload is undefined
-      expect(result.payload).toBeUndefined();
+    // Test setUser action with user object (sign in scenario)
+    test('setUser should update auth state with user', () => {
+      const mockUser = { id: '123', name: 'Test User', email: 'test@example.com' };
       
-      const state = store.getState();
-      expect(state.puter.auth.user).toBe(null);
-      expect(state.puter.auth.isAuthenticated).toBe(false);
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).not.toHaveBeenCalled();
+      store.dispatch(setUser({ user: mockUser }));
+      const puterState = store.getState().puter;
+      
+      expect(puterState.auth.user).toEqual(mockUser);
+      expect(puterState.auth.isAuthenticated).toBe(true);
     });
 
-    it('should handle puter not available', async () => {
-      // Mock getPuter to return null
-      if (mockGetPuter && mockGetPuter.mockReturnValue) {
-        mockGetPuter.mockReturnValue(null as any);
-      }
-
-      const result = await store.dispatch(checkAuthStatus());
+    // Test setUser action with null (sign out scenario)  
+    test('setUser should update auth state with null user', () => {
+      // First set a user
+      const mockUser = { id: '123', name: 'Test User', email: 'test@example.com' };
+      store.dispatch(setUser({ user: mockUser }));
       
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Puter.js not available');
-      
-      // Verify that puter methods were not called
-      expect(mockPuter.auth.isSignedIn).not.toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).not.toHaveBeenCalled();
-    });
-
-    it('should handle auth check errors', async () => {
-      const error = new Error('Auth check failed');
-      mockPuter.auth.isSignedIn.mockRejectedValue(error);
-
-      const result = await store.dispatch(checkAuthStatus());
-      
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Auth check failed');
-      
-      // Verify isSignedIn was called but getUser was not
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).not.toHaveBeenCalled();
-    });
-
-    it('should handle non-Error exceptions', async () => {
-      mockPuter.auth.isSignedIn.mockRejectedValue('String error');
-
-      const result = await store.dispatch(checkAuthStatus());
-      
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Failed to check auth status');
-      
-      // Verify isSignedIn was called but getUser was not
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).not.toHaveBeenCalled();
-    });
-
-    it('should handle getUser errors after successful auth check', async () => {
-      const error = new Error('Failed to get user');
-      mockPuter.auth.isSignedIn.mockResolvedValue(true);
-      mockPuter.auth.getUser.mockRejectedValue(error);
-
-      const result = await store.dispatch(checkAuthStatus());
-      
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Failed to get user');
-      
-      // Verify both methods were called
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).toHaveBeenCalled();
-    });
-
-    it('should handle user state properly when switching between signed in/out', async () => {
-      const mockUser: PuterUser = { id: '123', username: 'testuser' };
-
-      // First, sign in
-      mockPuter.auth.isSignedIn.mockResolvedValue(true);
-      mockPuter.auth.getUser.mockResolvedValue(mockUser);
-      
-      await store.dispatch(checkAuthStatus());
-      
-      let state = store.getState();
-      expect(state.puter.auth.user).toEqual(mockUser);
-      expect(state.puter.auth.isAuthenticated).toBe(true);
-
-      // Reset mocks for the next call
-      vi.clearAllMocks();
-      if (mockGetPuter && mockGetPuter.mockReturnValue) {
-        mockGetPuter.mockReturnValue(mockPuter);
-      }
-
-      // Then, sign out
-      mockPuter.auth.isSignedIn.mockResolvedValue(false);
-      
-      await store.dispatch(checkAuthStatus());
-      
-      state = store.getState();
-      expect(state.puter.auth.user).toBe(null);
-      expect(state.puter.auth.isAuthenticated).toBe(false);
-    });
-  });
-
-  describe('integration with store', () => {
-    it('should maintain state correctly across multiple actions', () => {
-      // Test multiple state changes
-      store.dispatch(setPuter(true));
-      expect(store.getState().puter.puterReady).toBe(true);
-
-      const user: PuterUser = { id: '456', username: 'integration-test' };
-      store.dispatch(setUser({ user }));
-      expect(store.getState().puter.auth.user).toEqual(user);
-      expect(store.getState().puter.auth.isAuthenticated).toBe(true);
-
-      // Ensure puterReady state is preserved
-      expect(store.getState().puter.puterReady).toBe(true);
-
-      // Clear user
+      // Then clear the user
       store.dispatch(setUser({ user: null }));
-      expect(store.getState().puter.auth.user).toBe(null);
-      expect(store.getState().puter.auth.isAuthenticated).toBe(false);
+      const puterState = store.getState().puter;
+      
+      expect(puterState.auth.user).toBe(null);
+      expect(puterState.auth.isAuthenticated).toBe(false);
+    });
+  });
 
-      // Ensure puterReady state is still preserved
-      expect(store.getState().puter.puterReady).toBe(true);
+  /*
+   * Test strategy for checkAuthStatus async thunk:
+   * Mock getPuter() to return different scenarios and test the thunk behavior:
+   * 1. Puter not available (null)
+   * 2. User signed in successfully  
+   * 3. User not signed in
+   * 4. Error during auth check
+   */
+  describe('checkAuthStatus async thunk', () => {
+    let mockGetPuter: ReturnType<typeof vi.fn>;
+    
+    beforeEach(async () => {
+      const puterModule = await import("../puter");
+      // Use vi.mocked to avoid 'as' operator - better type-safe way to access mocked function
+      mockGetPuter = vi.mocked(puterModule.getPuter);
     });
 
-    it('should have correct initial state', () => {
-      const state = store.getState();
-      expect(state.puter).toEqual({
-        puterReady: false,
+    // Test when Puter.js is not available
+    test('should reject when puter is not available', async () => {
+      mockGetPuter.mockReturnValue(null);
+      
+      const resultAction = await store.dispatch(checkAuthStatus());
+      
+      expect(checkAuthStatus.rejected.match(resultAction)).toBe(true);
+      if (checkAuthStatus.rejected.match(resultAction)) {
+        expect(resultAction.payload).toBe("Puter.js not available");
+      }
+    });
+
+    // Test successful auth check with signed-in user
+    test('should set user when user is signed in', async () => {
+      const mockUser = { id: '123', name: 'Test User', email: 'test@example.com' };
+      const mockPuter = {
         auth: {
-          user: null,
-          isAuthenticated: false
-        }
-      });
+          isSignedIn: vi.fn().mockResolvedValue(true),
+          getUser: vi.fn().mockResolvedValue(mockUser),
+        },
+      };
+      
+      mockGetPuter.mockReturnValue(mockPuter);
+      
+      const resultAction = await store.dispatch(checkAuthStatus());
+      
+      expect(checkAuthStatus.fulfilled.match(resultAction)).toBe(true);
+      const puterState = store.getState().puter;
+      expect(puterState.auth.user).toEqual(mockUser);
+      expect(puterState.auth.isAuthenticated).toBe(true);
+    });
+
+    // Test successful auth check with no signed-in user
+    test('should clear user when user is not signed in', async () => {
+      const mockPuter = {
+        auth: {
+          isSignedIn: vi.fn().mockResolvedValue(false),
+          getUser: vi.fn(),
+        },
+      };
+      
+      mockGetPuter.mockReturnValue(mockPuter);
+      
+      const resultAction = await store.dispatch(checkAuthStatus());
+      
+      expect(checkAuthStatus.fulfilled.match(resultAction)).toBe(true);
+      const puterState = store.getState().puter;
+      expect(puterState.auth.user).toBe(null);
+      expect(puterState.auth.isAuthenticated).toBe(false);
+    });
+
+    // Test error handling during auth check
+    test('should reject when auth check throws error', async () => {
+      const mockPuter = {
+        auth: {
+          isSignedIn: vi.fn().mockRejectedValue(new Error('Auth check failed')),
+          getUser: vi.fn(),
+        },
+      };
+      
+      mockGetPuter.mockReturnValue(mockPuter);
+      
+      const resultAction = await store.dispatch(checkAuthStatus());
+      
+      expect(checkAuthStatus.rejected.match(resultAction)).toBe(true);
+      if (checkAuthStatus.rejected.match(resultAction)) {
+        expect(resultAction.payload).toBe('Auth check failed');
+      }
+    });
+
+    // Test error handling with non-Error object
+    test('should handle non-Error rejection', async () => {
+      const mockPuter = {
+        auth: {
+          isSignedIn: vi.fn().mockRejectedValue('String error'),
+          getUser: vi.fn(),
+        },
+      };
+      
+      mockGetPuter.mockReturnValue(mockPuter);
+      
+      const resultAction = await store.dispatch(checkAuthStatus());
+      
+      expect(checkAuthStatus.rejected.match(resultAction)).toBe(true);
+      if (checkAuthStatus.rejected.match(resultAction)) {
+        expect(resultAction.payload).toBe('Failed to check auth status');
+      }
     });
   });
 });

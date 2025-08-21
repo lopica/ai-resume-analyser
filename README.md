@@ -1,6 +1,6 @@
-# Welcome to React Router!
+# AI Resume Analyser
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A modern, production-ready application for analyzing resumes using AI, built with React Router.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 

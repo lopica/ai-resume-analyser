@@ -30,15 +30,15 @@ const Auth = () => {
                 </div>
                 <div>
                     {(isSignInLoading || isSignOutLoading ) ? (
-                        <button className="auth-button animate-pulse">
+                        <button className="auth-button animate-pulse" data-testid="auth-loading">
                             <p>Signing you in ...</p>
                         </button>
                     ) : auth.isAuthenticated ? (
-                        <button className="auth-button" onClick={() => signOut()}>
+                        <button className="auth-button" onClick={() => signOut()} data-testid="sign-out-button">
                             <p>Log Out</p>
                         </button>
                     ) : (
-                        <button className="auth-button" onClick={() => signIn()}>
+                        <button className="auth-button" onClick={() => signIn()} data-testid="sign-in-button">
                             <p>Log In</p>
                         </button>
                     )}
