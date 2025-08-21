@@ -42,10 +42,9 @@ export default defineConfig({
     // Video recording on failure
     video: 'retain-on-failure',
     
-    // Optimized timeouts for faster execution
-    // Real AI analysis: 30s, Mock responses: 5s
-    actionTimeout: 30000, // 30 seconds for actions
-    navigationTimeout: 15000, // 15 seconds for navigation
+    // More forgiving timeouts for CI environment
+    actionTimeout: 15000, // 15 seconds for actions
+    navigationTimeout: 30000, // 30 seconds for navigation
   },
 
   // Configure projects for major browsers
