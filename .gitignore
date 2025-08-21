@@ -1,6 +1,7 @@
 .DS_Store
 /node_modules/
-
+.claude/
+.idea/
 # React Router
 /.react-router/
 /build/
