@@ -8,9 +8,9 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "test": "vitest",
-    "test:unit": "vitest run",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:integration:watch": "vitest --config vitest.integration.config.ts",
+    "test:unit": "vitest run --exclude=tests/integration/**/*",
+    "test:integration": "vitest run tests/integration --testTimeout=30000",
+    "test:integration:watch": "vitest tests/integration --testTimeout=30000",
     "test:e2e": "playwright test",
     "test:e2e:full": "playwright test --grep 'Extended' && playwright test tests/e2e/*.disabled",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e"

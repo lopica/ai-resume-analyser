@@ -8,9 +8,9 @@ export default defineConfig({
   plugins: [tailwindcss(), !process.env.VITEST && reactRouter(), tsconfigPaths()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],
-    exclude: ['**/e2e/**', '**/integration/**', 'node_modules/**'],
+    exclude: ['**/e2e/**', 'node_modules/**'],
     globals: true,
+    setupFiles: ['./test-setup.ts'],
   },
   resolve: {
     alias: {
