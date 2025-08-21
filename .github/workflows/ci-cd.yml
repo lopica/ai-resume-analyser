@@ -13,8 +13,16 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
+    - name: Debug workflow trigger
+      run: |
+        echo "🚀 Workflow triggered!"
+        echo "Event: ${{ github.event_name }}"
+        echo "Ref: ${{ github.ref }}"
+        echo "SHA: ${{ github.sha }}"
+        
     - name: Checkout code
       uses: actions/checkout@v4
     
@@ -37,7 +45,7 @@ jobs:
       run: npm run test:integration
     
     - name: Cache Playwright browsers
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/ms-playwright
         key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
@@ -84,6 +92,7 @@ jobs:
   merge-to-main:
     needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     
     steps:
