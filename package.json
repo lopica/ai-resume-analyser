@@ -7,7 +7,13 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration:watch": "vitest --config vitest.integration.config.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:full": "playwright test --grep 'Extended' && playwright test tests/e2e/*.disabled",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e"
   },
   "dependencies": {
     "@react-router/node": "^7.7.1",
@@ -25,6 +31,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@react-router/dev": "^7.7.1",
     "@tailwindcss/vite": "^4.1.4",
     "@testing-library/jest-dom": "^6.7.0",
@@ -34,6 +41,7 @@
     "@types/react-dom": "^19.1.2",
     "@vitest/coverage-v8": "^3.2.4",
     "jsdom": "^26.1.0",
+    "msw": "^2.10.5",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5.8.3",

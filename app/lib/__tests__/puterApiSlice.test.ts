@@ -1,159 +1,303 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
-import { puterApiSlice } from '~/lib/puterApiSlice';
-import puterSlice, { checkAuthStatus, setPuter, setUser } from '~/lib/puterSlice';
+/// <reference types="../../../types/puter.d.ts" />
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { configureStore } from "@reduxjs/toolkit";
+import { puterApiSlice } from "../puterApiSlice";
+import type { AppDispatch } from "../store";
 
-// --- mock getPuter before importing slice uses it ---
-vi.mock('~/lib/puter', () => ({
-  getPuter: vi.fn()
+// Mock the puter module
+vi.mock("../puter", () => ({
+  getPuter: vi.fn(),
 }));
-import { getPuter } from '~/lib/puter';
 
-// Shared mock object
-const mockPuter = {
-  auth: {
-    signIn: vi.fn(),
-    signOut: vi.fn(),
-    getUser: vi.fn(),
-    isSignedIn: vi.fn()
-  },
-  fs: {
-    write: vi.fn(),
-    read: vi.fn(),
-    readdir: vi.fn(),
-    upload: vi.fn(),
-    delete: vi.fn()
-  },
-  ai: {
-    chat: vi.fn(),
-    img2txt: vi.fn()
-  },
-  kv: {
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-    list: vi.fn(),
-    flush: vi.fn()
-  }
+// Mock the puterSlice actions
+vi.mock("../puterSlice", () => ({
+  checkAuthStatus: vi.fn(() => ({ type: "puter/checkAuthStatus" })),
+  setPuter: vi.fn((payload) => ({ type: "puter/setPuter", payload })),
+  setUser: vi.fn((payload) => ({ type: "puter/setUser", payload })),
+}));
+
+/*
+ * Test strategy for puterApiSlice (RTK Query):
+ * 
+ * This is a complex RTK Query API slice with multiple endpoints covering:
+ * 1. Auth endpoints (signIn, signOut, refreshUser, init)
+ * 2. File system endpoints (fsWrite, fsRead, fsReadir, fsUpload, fsDelete)
+ * 3. AI endpoints (aiChat, aiFeedback, aiImg2txt)  
+ * 4. Key-Value store endpoints (kvGet, kvSet, kvDelete, kvList, kvFlush)
+ * 
+ * Testing strategy:
+ * - Focus on core patterns rather than testing every endpoint exhaustively
+ * - Test success cases, error cases, and puter unavailable scenarios
+ * - Use representative endpoints from each category
+ * - Mock getPuter() function to simulate different conditions
+ * 
+ * Note: Full integration testing would require extensive mocking of Puter.js APIs.
+ * Here we focus on the slice structure and key endpoint behaviors.
+ */
+type TestStoreState = {
+  [key: string]: unknown;
 };
 
-// Test store setup
-function createTestStore() {
-  return configureStore({
-    reducer: {
-      puter: puterSlice.reducer, // explicitly "puter" key
-      [puterApiSlice.reducerPath]: puterApiSlice.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(puterApiSlice.middleware),
-  });
-}
-
-const mockedGetPuter = getPuter as MockedFunction<typeof getPuter>
-
-describe('puterSlice', () => {
-  let store: ReturnType<typeof createTestStore>;
-
+describe('puterApiSlice', () => {
+  let store: ReturnType<typeof configureStore<TestStoreState>> & { dispatch: AppDispatch };
+  
   beforeEach(() => {
-    store = createTestStore();
+    // Create a fresh store for each test
+    store = configureStore({
+      reducer: {
+        [puterApiSlice.reducerPath]: puterApiSlice.reducer,
+      },
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(puterApiSlice.middleware),
+    });
     vi.clearAllMocks();
-
-    // default behavior: always return mockPuter
-    mockedGetPuter.mockReturnValue(mockPuter);
   });
 
-  describe('reducers', () => {
-    it('should handle setUser with user data', () => {
-      const mockUser = { id: '123', username: 'testuser', email: 'test@example.com' };
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-      store.dispatch(setUser({ user: mockUser }));
+  // Test basic API slice configuration
+  test('should have correct reducer path and tag types', () => {
+    expect(puterApiSlice.reducerPath).toBe('puterApi');
+    
+    // Check that the slice is properly configured
+    const state = store.getState();
+    // Access the reducer state directly by its path - no need for 'as' with proper typing
+    const puterApiState = state[puterApiSlice.reducerPath];
+    expect(puterApiState).toBeDefined();
+    expect(puterApiState).toHaveProperty('queries');
+    expect(puterApiState).toHaveProperty('mutations');
+  });
 
-      const state = store.getState();
-      expect(state.puter.auth.user).toEqual(mockUser);
-      expect(state.puter.auth.isAuthenticated).toBe(true);
+  /*
+   * Test strategy for auth endpoints:
+   * Test representative auth endpoint (signIn) with success/failure scenarios
+   */
+  describe('auth endpoints', () => {
+    let mockGetPuter: ReturnType<typeof vi.fn>;
+    
+    beforeEach(async () => {
+      const puterModule = await import("../puter");
+      // Use vi.mocked to avoid 'as' operator - better type-safe way to access mocked function
+      mockGetPuter = vi.mocked(puterModule.getPuter);
     });
 
-    it('should handle setUser with null user', () => {
-      const mockUser = { id: '123', username: 'testuser' };
-      store.dispatch(setUser({ user: mockUser }));
-      store.dispatch(setUser({ user: null }));
+    // Test signIn success scenario  
+    test('signIn should succeed when puter is available', async () => {
+      const mockPuter = {
+        auth: {
+          signIn: vi.fn().mockResolvedValue(undefined),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
 
-      const state = store.getState();
-      expect(state.puter.auth.user).toBe(null);
-      expect(state.puter.auth.isAuthenticated).toBe(false);
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.signIn.initiate()
+      ).unwrap();
+
+      expect(result).toBeUndefined();
+      expect(mockPuter.auth.signIn).toHaveBeenCalled();
     });
 
-    it('should handle setPuter true', () => {
-      store.dispatch(setPuter(true));
+    // Test signIn when puter is not available
+    test('signIn should fail when puter is not available', async () => {
+      mockGetPuter.mockReturnValue(null);
 
-      const state = store.getState();
-      expect(state.puter.puterReady).toBe(true);
+      try {
+        await store.dispatch(
+          puterApiSlice.endpoints.signIn.initiate()
+        ).unwrap();
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error).toBe("Puter.js not available");
+      }
     });
 
-    it('should handle setPuter false', () => {
-      store.dispatch(setPuter(true));
-      store.dispatch(setPuter(false));
+    // Test signIn error handling
+    test('signIn should handle auth errors', async () => {
+      const mockPuter = {
+        auth: {
+          signIn: vi.fn().mockRejectedValue(new Error('Sign in failed')),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
 
-      const state = store.getState();
-      expect(state.puter.puterReady).toBe(false);
+      try {
+        await store.dispatch(
+          puterApiSlice.endpoints.signIn.initiate()
+        ).unwrap();
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error).toBe('Sign in failed');
+      }
     });
   });
 
-  describe('checkAuthStatus async thunk', () => {
-    it('should check auth status and set user when signed in', async () => {
-      const mockUser = { id: '123', username: 'testuser' };
-      mockPuter.auth.isSignedIn.mockResolvedValue(true);
-      mockPuter.auth.getUser.mockResolvedValue(mockUser);
-
-      const result = await store.dispatch(checkAuthStatus());
-
-      expect(checkAuthStatus.fulfilled.match(result)).toBe(true);
-      const state = store.getState();
-      expect(state.puter.auth.user).toEqual(mockUser);
-      expect(state.puter.auth.isAuthenticated).toBe(true);
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).toHaveBeenCalled();
+  /*
+   * Test strategy for filesystem endpoints:
+   * Test representative filesystem endpoint (fsWrite) with different scenarios
+   */
+  describe('filesystem endpoints', () => {
+    let mockGetPuter: ReturnType<typeof vi.fn>;
+    
+    beforeEach(async () => {
+      const puterModule = await import("../puter");
+      // Use vi.mocked to avoid 'as' operator - better type-safe way to access mocked function
+      mockGetPuter = vi.mocked(puterModule.getPuter);
     });
 
-    it('should set user to null when not signed in', async () => {
-      mockPuter.auth.isSignedIn.mockResolvedValue(false);
+    // Test fsWrite success scenario
+    test('fsWrite should succeed when puter is available', async () => {
+      // Use simple object to avoid serialization issues with File objects
+      const mockFileResponse = { name: 'test.txt', path: '/test.txt' };
+      const mockPuter = {
+        fs: {
+          write: vi.fn().mockResolvedValue(mockFileResponse),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
 
-      const result = await store.dispatch(checkAuthStatus());
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.fsWrite.initiate({
+          path: '/test.txt',
+          data: 'test content'
+        })
+      ).unwrap();
 
-      expect(checkAuthStatus.fulfilled.match(result)).toBe(true);
-      const state = store.getState();
-      expect(state.puter.auth.user).toBe(null);
-      expect(state.puter.auth.isAuthenticated).toBe(false);
-      expect(mockPuter.auth.isSignedIn).toHaveBeenCalled();
-      expect(mockPuter.auth.getUser).not.toHaveBeenCalled();
+      expect(result).toBe(mockFileResponse);
+      expect(mockPuter.fs.write).toHaveBeenCalledWith('/test.txt', 'test content');
     });
 
-    it('should handle puter not available', async () => {
-      mockedGetPuter.mockReturnValue(null);
+    // Test fsWrite when puter is not available
+    test('fsWrite should fail when puter is not available', async () => {
+      mockGetPuter.mockReturnValue(null);
 
-      const result = await store.dispatch(checkAuthStatus());
+      try {
+        await store.dispatch(
+          puterApiSlice.endpoints.fsWrite.initiate({
+            path: '/test.txt',
+            data: 'test content'
+          })
+        ).unwrap();
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error).toBe("Puter.js not available");
+      }
+    });
+  });
 
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Puter.js not available');
+  /*
+   * Test strategy for AI endpoints:
+   * Test representative AI endpoint (aiChat) with different input types
+   */
+  describe('AI endpoints', () => {
+    let mockGetPuter: ReturnType<typeof vi.fn>;
+    
+    beforeEach(async () => {
+      const puterModule = await import("../puter");
+      // Use vi.mocked to avoid 'as' operator - better type-safe way to access mocked function
+      mockGetPuter = vi.mocked(puterModule.getPuter);
     });
 
-    it('should handle auth check errors', async () => {
-      const error = new Error('Auth check failed');
-      mockPuter.auth.isSignedIn.mockRejectedValue(error);
+    // Test aiChat with string prompt
+    test('aiChat should handle string prompts', async () => {
+      const mockResponse = { message: 'AI response', id: '123' };
+      const mockPuter = {
+        ai: {
+          chat: vi.fn().mockResolvedValue(mockResponse),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
 
-      const result = await store.dispatch(checkAuthStatus());
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.aiChat.initiate({
+          prompt: 'Hello AI',
+        })
+      ).unwrap();
 
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Auth check failed');
+      expect(result).toBe(mockResponse);
+      expect(mockPuter.ai.chat).toHaveBeenCalledWith('Hello AI', undefined, undefined, undefined);
     });
 
-    it('should handle non-Error exceptions', async () => {
-      mockPuter.auth.isSignedIn.mockRejectedValue('String error');
+    // Test aiChat with message array
+    test('aiChat should handle message arrays', async () => {
+      const mockMessages: ChatMessage[] = [{ role: 'user', content: 'Hello' }];
+      const mockResponse = { message: 'AI response' };
+      const mockPuter = {
+        ai: {
+          chat: vi.fn().mockResolvedValue(mockResponse),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
 
-      const result = await store.dispatch(checkAuthStatus());
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.aiChat.initiate({
+          prompt: mockMessages,
+          testMode: true,
+        })
+      ).unwrap();
 
-      expect(checkAuthStatus.rejected.match(result)).toBe(true);
-      expect(result.payload).toBe('Failed to check auth status');
+      expect(result).toBe(mockResponse);
+      expect(mockPuter.ai.chat).toHaveBeenCalledWith(mockMessages, undefined, true, undefined);
     });
+  });
+
+  /*
+   * Test strategy for KV endpoints:
+   * Test representative KV endpoint (kvGet) with different value scenarios
+   */
+  describe('key-value store endpoints', () => {
+    let mockGetPuter: ReturnType<typeof vi.fn>;
+    
+    beforeEach(async () => {
+      const puterModule = await import("../puter");
+      // Use vi.mocked to avoid 'as' operator - better type-safe way to access mocked function
+      mockGetPuter = vi.mocked(puterModule.getPuter);
+    });
+
+    // Test kvGet with existing key
+    test('kvGet should return value for existing key', async () => {
+      const mockPuter = {
+        kv: {
+          get: vi.fn().mockResolvedValue('stored value'),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
+
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.kvGet.initiate('test-key')
+      ).unwrap();
+
+      expect(result).toBe('stored value');
+      expect(mockPuter.kv.get).toHaveBeenCalledWith('test-key');
+    });
+
+    // Test kvGet with non-existent key
+    test('kvGet should return null for non-existent key', async () => {
+      const mockPuter = {
+        kv: {
+          get: vi.fn().mockResolvedValue(null),
+        },
+      };
+      mockGetPuter.mockReturnValue(mockPuter);
+
+      const result = await store.dispatch(
+        puterApiSlice.endpoints.kvGet.initiate('non-existent-key')
+      ).unwrap();
+
+      expect(result).toBe(null);
+    });
+  });
+
+  // Test that all expected hooks are exported
+  test('should export all endpoint hooks', () => {
+    const hooks = puterApiSlice;
+    
+    // Verify some key hooks exist (not exhaustive, just representative)
+    expect(typeof hooks.useSignInMutation).toBe('function');
+    expect(typeof hooks.useFsWriteMutation).toBe('function');
+    expect(typeof hooks.useAiChatMutation).toBe('function');
+    expect(typeof hooks.useKvGetQuery).toBe('function');
   });
 });

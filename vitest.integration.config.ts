@@ -5,12 +5,15 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tailwindcss(), !process.env.VITEST && reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), tsconfigPaths()],
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
-    exclude: ['**/e2e/**', '**/integration/**', 'node_modules/**'],
+    include: ['tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    exclude: ['node_modules/**'],
     globals: true,
+    testTimeout: 30000, // Longer timeout for integration tests
+    hookTimeout: 30000,
   },
   resolve: {
     alias: {

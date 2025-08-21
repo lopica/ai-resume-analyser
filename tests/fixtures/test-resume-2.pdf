@@ -1,0 +1,89 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/Resources <<
+  /Font <<
+    /F1 4 0 R
+  >>
+>>
+/MediaBox [0 0 612 792]
+/Contents 5 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Times-Roman
+>>
+endobj
+
+5 0 obj
+<<
+/Length 450
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(Jane Smith) Tj
+0 -24 Td
+(Backend Engineer) Tj
+0 -24 Td
+(jane.smith@email.com | (555) 987-6543) Tj
+0 -48 Td
+(EXPERIENCE) Tj
+0 -24 Td
+(Senior Node.js Developer - DataSoft Inc (2019-2023)) Tj
+0 -12 Td
+(• Built scalable APIs using Node.js and Express) Tj
+0 -12 Td
+(• Designed microservices architecture with Docker and Kubernetes) Tj
+0 -12 Td
+(• Optimized database queries and implemented caching strategies) Tj
+0 -12 Td
+(• Led team of 4 junior developers) Tj
+0 -24 Td
+(SKILLS) Tj
+0 -12 Td
+(• Node.js, Express, MongoDB, PostgreSQL, Redis) Tj
+0 -12 Td
+(• Docker, Kubernetes, AWS, Jenkins, GraphQL) Tj
+ET
+endstream
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000269 00000 n 
+0000000346 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+848
+%%EOF
