@@ -2,5 +2,9 @@
 /node_modules/
 .claude/
 .idea/
-
+test-results
 /build/
+playwright-report
+tests/e2e/language-switching.spec.ts-snapshots
+debug-page-initial.png
+test-setup-failed.png

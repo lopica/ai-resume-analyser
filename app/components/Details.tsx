@@ -5,6 +5,7 @@ import {
     AccordionHeader,
     AccordionItem,
 } from "./Accordion";
+import { useTranslation } from "react-i18next";
 
 const ScoreBadge = ({ score }: { score: number }) => {
     return (
@@ -107,13 +108,15 @@ const CategoryContent = ({
 };
 
 const Details = ({ feedback }: { feedback: Feedback }) => {
+    const { t } = useTranslation();
+    
     return (
         <div className="flex flex-col gap-4 w-full">
             <Accordion>
                 <AccordionItem id="tone-style">
                     <AccordionHeader itemId="tone-style">
                         <CategoryHeader
-                            title="Tone & Style"
+                            title={t('details.toneAndStyle')}
                             categoryScore={feedback.toneAndStyle.score}
                         />
                     </AccordionHeader>
@@ -124,7 +127,7 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
                 <AccordionItem id="content">
                     <AccordionHeader itemId="content">
                         <CategoryHeader
-                            title="Content"
+                            title={t('details.content')}
                             categoryScore={feedback.content.score}
                         />
                     </AccordionHeader>
@@ -135,7 +138,7 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
                 <AccordionItem id="structure">
                     <AccordionHeader itemId="structure">
                         <CategoryHeader
-                            title="Structure"
+                            title={t('details.structure')}
                             categoryScore={feedback.structure.score}
                         />
                     </AccordionHeader>
@@ -146,7 +149,7 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
                 <AccordionItem id="skills">
                     <AccordionHeader itemId="skills">
                         <CategoryHeader
-                            title="Skills"
+                            title={t('details.skills')}
                             categoryScore={feedback.skills.score}
                         />
                     </AccordionHeader>

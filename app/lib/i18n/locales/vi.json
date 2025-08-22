@@ -1,0 +1,117 @@
+{
+  "welcomeMessage": "Nắm bắt cách nhà tuyển dụng đánh giá hồ sơ xin việc của bạn",
+  "navbar": {
+    "brandName": "RESUMIND",
+    "uploadResume": "Tải lên CV"
+  },
+  "home": {
+    "noResumes": "Không tìm thấy CV nào. Tải lên CV đầu tiên để nhận phản hồi.",
+    "reviewSubmissions": "Xem lại các đơn và kiểm tra phản hồi từ AI.",
+    "uploadResumeButton": "Tải lên CV"
+  },
+  "upload": {
+    "heading": "Phản hồi thông minh cho công việc mơ ước của bạn",
+    "subheading": "Thả CV của bạn để nhận điểm ATS và lời khuyên cải thiện",
+    "companyName": "Tên công ty",
+    "jobTitle": "Vị trí công việc",
+    "jobDescription": "Mô tả công việc",
+    "uploadResume": "Tải lên CV",
+    "analyzeResume": "Phân tích CV",
+    "status": {
+      "uploading": "Đang tải lên tệp ...",
+      "converting": "Đang chuyển đổi thành hình ảnh ...",
+      "uploadingImage": "Đang tải lên hình ảnh ...",
+      "preparing": "Đang chuẩn bị dữ liệu ...",
+      "analyzing": "Đang phân tích ...",
+      "complete": "Phân tích hoàn tất, đang chuyển hướng ..."
+    },
+    "errors": {
+      "uploadFailed": "Lỗi: Không thể tải lên tệp",
+      "convertFailed": "Lỗi: Không thể chuyển đổi PDF thành hình ảnh",
+      "imageUploadFailed": "Lỗi: Không thể tải lên hình ảnh",
+      "analysisFailed": "Lỗi: Không thể phân tích CV",
+      "companyNameRequired": "Vui lòng nhập tên công ty",
+      "jobTitleRequired": "Vui lòng nhập vị trí công việc",
+      "jobDescriptionRequired": "Vui lòng nhập mô tả công việc",
+      "fileRequired": "Vui lòng chọn tệp CV"
+    }
+  },
+  "fileUploader": {
+    "dragActive": "Thả tệp vào đây ...",
+    "dragInactive": "Kéo và thả tệp PDF vào đây, hoặc nhấp để chọn",
+    "remove": "Xóa",
+    "clickToUpload": "Nhấp để tải lên",
+    "orDragAndDrop": "hoặc kéo và thả",
+    "pdfMaxSize": "PDF (tối đa 20 MB)"
+  },
+  "auth": {
+    "welcome": "Chào mừng",
+    "subtitle": "Đăng nhập để tiếp tục hành trình nghề nghiệp của bạn",
+    "signingIn": "Đang đăng nhập ...",
+    "logOut": "Đăng xuất",
+    "logIn": "Đăng nhập",
+    "metaDescription": "Đăng nhập tài khoản của bạn"
+  },
+  "wipe": {
+    "loading": "Đang tải...",
+    "error": "Lỗi:",
+    "failedToLoad": "Không thể tải tệp",
+    "retry": "Thử lại",
+    "title": "Quản lý dữ liệu ứng dụng",
+    "authenticatedAs": "Đã xác thực với tên:",
+    "existingFiles": "Các tệp hiện có",
+    "noFiles": "Không tìm thấy tệp nào",
+    "directory": "Thư mục",
+    "noFilesToDelete": "Không có tệp nào để xóa",
+    "deletingFiles": "Đang xóa tệp...",
+    "deleting": "Đang xóa",
+    "clearingStore": "Đang xóa kho lưu trữ khóa-giá trị...",
+    "refreshingList": "Đang làm mới danh sách tệp...",
+    "wipeSuccess": "Xóa dữ liệu ứng dụng thành công!",
+    "error": "Lỗi:",
+    "unknownError": "Đã xảy ra lỗi không xác định",
+    "wipeAppData": "Xóa dữ liệu ứng dụng",
+    "deleting": "Đang xóa...",
+    "refreshFiles": "Làm mới tệp",
+    "backToHome": "Về trang chủ",
+    "warningTitle": "Cảnh báo:",
+    "warningMessage": "Hành động này sẽ xóa vĩnh viễn tất cả các tệp đã tải lên và dữ liệu đã lưu trữ của bạn. Không thể hoàn tác."
+  },
+  "resume": {
+    "backToHomepage": "Về trang chủ",
+    "errorLoading": "Lỗi khi tải CV",
+    "unableToLoad": "Không thể tải dữ liệu CV. Vui lòng thử lại.",
+    "loading": "Đang tải...",
+    "resumePreview": "Xem trước CV",
+    "resumeReview": "Đánh giá CV",
+    "metaDescription": "Tổng quan chi tiết về CV của bạn"
+  },
+  "summary": {
+    "yourResumeScore": "Điểm CV của bạn",
+    "scoreDescription": "Điểm này được tính toán dựa trên các biến được liệt kê bên dưới.",
+    "toneAndStyle": "Giọng điệu & Phong cách",
+    "content": "Nội dung",
+    "structure": "Cấu trúc",
+    "skill": "Kỹ năng"
+  },
+  "ats": {
+    "atsScore": "Điểm ATS",
+    "question": "CV của bạn vượt qua Hệ thống theo dõi ứng viên như thế nào?",
+    "description": "CV của bạn đã được quét như một nhà tuyển dụng sẽ làm. Đây là cách nó thực hiện:",
+    "betterScore": "Muốn điểm số tốt hơn? Cải thiện CV của bạn bằng cách áp dụng các gợi ý được liệt kê bên dưới."
+  },
+  "details": {
+    "toneAndStyle": "Giọng điệu & Phong cách",
+    "content": "Nội dung",
+    "structure": "Cấu trúc",
+    "skills": "Kỹ năng"
+  },
+  "resumeCard": {
+    "defaultTitle": "CV"
+  },
+  "scoreBadge": {
+    "strong": "Mạnh",
+    "goodStart": "Khởi đầu tốt",
+    "needsWork": "Cần cải thiện"
+  }
+}

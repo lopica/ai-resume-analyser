@@ -1,6 +1,7 @@
 import {type MouseEventHandler, useCallback, useState} from "react";
 import {useDropzone} from "react-dropzone";
 import {formatSize} from "~/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface FileUploaderProps {
     onFileSelect?: (file: File | null) => void
@@ -8,6 +9,7 @@ interface FileUploaderProps {
 
 const FileUploader = ({onFileSelect}: FileUploaderProps) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const { t } = useTranslation();
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0] || null
@@ -61,10 +63,10 @@ const FileUploader = ({onFileSelect}: FileUploaderProps) => {
                         </div>
                         <p className="text-lg text-gray-500">
                             <span className="font-semibold">
-                                Click to upload
-                            </span> or drag and drop
+                                {t('fileUploader.clickToUpload')}
+                            </span> {t('fileUploader.orDragAndDrop')}
                         </p>
-                        <p className="text-lg text-gray-500">PDF (max 20 MB)</p>
+                        <p className="text-lg text-gray-500">{t('fileUploader.pdfMaxSize')}</p>
                     </div>
                 )}
             </div>
