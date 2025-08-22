@@ -74,7 +74,7 @@ async function clickFlag(page: Page, flagText: string) {
         await page.mouse.click(box.x + box.width/2, box.y + box.height/2);
       }
     },
-    () => flag.evaluate(el => el.click())
+    () => flag.evaluate(el => (el as HTMLElement).click())
   ];
   
   for (const strategy of strategies) {
