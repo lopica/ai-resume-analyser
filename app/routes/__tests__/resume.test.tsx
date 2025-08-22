@@ -20,6 +20,23 @@ vi.mock("react-router", async () => {
   };
 });
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "resume.backToHomepage": "Back to Homepage",
+        "resume.errorLoading": "Error Loading Resume",
+        "resume.unableToLoad": "Unable to load resume data. Please try again.",
+        "resume.loading": "Loading...",
+        "resume.resumePreview": "Resume preview",
+        "resume.resumeReview": "Resume Review"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock components
 vi.mock("~/components/Summary", () => ({
   default: ({ feedback }: { feedback: Feedback }) => (

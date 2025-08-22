@@ -2,6 +2,21 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import FileUploader from "../FileUploader";
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "fileUploader.clickToUpload": "Click to upload",
+        "fileUploader.orDragAndDrop": "or drag and drop", 
+        "fileUploader.pdfMaxSize": "PDF (max 20 MB)",
+        "fileUploader.remove": "Remove"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock the utils module
 vi.mock("~/lib/utils", () => ({
   formatSize: vi.fn((bytes: number) => {

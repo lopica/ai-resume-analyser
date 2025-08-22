@@ -8,6 +8,23 @@ import WipeApp from "../wipe";
 import puterSlice from "~/lib/puterSlice";
 import { puterApiSlice } from "~/lib/puterApiSlice";
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "wipe.loading": "Loading...",
+        "wipe.error": "Error:",
+        "wipe.title": "App Data Management",
+        "wipe.authenticatedAs": "Authenticated as:",
+        "wipe.wipeAppData": "Wipe App Data",
+        "wipe.backToHome": "Back to Home"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock dependencies
 const mockNavigate = vi.fn();
 vi.mock("react-router", async () => {

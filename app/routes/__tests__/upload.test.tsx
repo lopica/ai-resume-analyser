@@ -36,6 +36,31 @@ vi.mock("~/components/FileUploader", () => ({
   ),
 }));
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "upload.heading": "Smart feedback for your dream job",
+        "upload.subheading": "Drop your resume for an ATS score and improvement tips",
+        "upload.companyName": "Company Name",
+        "upload.jobTitle": "Job Title", 
+        "upload.jobDescription": "Job Description",
+        "upload.uploadResume": "Upload Resume",
+        "upload.analyzeResume": "Analyze Resume",
+        "upload.status.uploading": "Uploading the file ...",
+        "upload.status.converting": "Converting to image ...",
+        "upload.status.complete": "Analysis complete, redirecting ...",
+        "upload.errors.companyNameRequired": "Please enter a company name",
+        "upload.errors.jobTitleRequired": "Please enter a job title",
+        "upload.errors.jobDescriptionRequired": "Please enter a job description",
+        "upload.errors.fileRequired": "Please select a resume file"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock utility functions
 vi.mock("~/lib/pdf2Img", () => ({
   convertPdfToImage: vi.fn(),

@@ -18,6 +18,22 @@ vi.mock("react-router", async () => {
   };
 });
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "auth.welcome": "Welcome",
+        "auth.subtitle": "Log In To Continue Your Job Journey",
+        "auth.signingIn": "Signing you in ...",
+        "auth.logOut": "Log Out",
+        "auth.logIn": "Log In"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock the RTK Query hooks
 const mockSignIn = vi.fn();
 const mockSignOut = vi.fn();

@@ -19,6 +19,21 @@ vi.mock("~/components/ResumeCard", () => ({
   ),
 }));
 
+// Mock react-i18next to provide translations
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        "welcomeMessage": "Track Your Applications & Resume Ratings",
+        "home.noResumes": "No resumes found. Upload your first resume to get feedback.",
+        "home.reviewSubmissions": "Review your submissions and check AI-powered feedback.",
+        "home.uploadResumeButton": "Upload Resume"
+      };
+      return translations[key] || key;
+    }
+  })
+}));
+
 // Mock react-router hooks
 const mockNavigate = vi.fn();
 vi.mock("react-router", async () => {
