@@ -10,6 +10,7 @@ import {
   useAiFeedbackMutation,
   useKvSetMutation,
 } from "~/lib/puterApiSlice";
+import { useTranslation } from "react-i18next";
 
 interface HandleAnalyzeProps {
   companyName: string;
@@ -23,6 +24,7 @@ const Upload = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const { t } = useTranslation();
 
   // RTK Query mutations
   const [fsUpload] = useFsUploadMutation();
@@ -43,32 +45,32 @@ const Upload = () => {
       setIsProcessing(true);
 
       // Step 1: Upload the PDF file
-      setStatusText("Uploading the file ...");
+      setStatusText(t('upload.status.uploading'));
       const uploadedFileResult = await fsUpload([file]).unwrap();
       if (!uploadedFileResult) {
-        setStatusText('Error: Failed to upload file');
+        setStatusText(t('upload.errors.uploadFailed'));
         return;
       }
 
       // Step 2: Convert PDF to image
-      setStatusText('Converting to image ...');
+      setStatusText(t('upload.status.converting'));
       const imageFile = await convertPdfToImage(file);
       console.log(imageFile);
       if (!imageFile || !imageFile.file) {
-        setStatusText('Error: Failed to convert PDF to image');
+        setStatusText(t('upload.errors.convertFailed'));
         return;
       }
 
       // Step 3: Upload the image
-      setStatusText('Uploading the image ...');
+      setStatusText(t('upload.status.uploadingImage'));
       const uploadedImageResult = await fsUpload([imageFile.file]).unwrap();
       if (!uploadedImageResult) {
-        setStatusText('Error: Failed to upload image');
+        setStatusText(t('upload.errors.imageUploadFailed'));
         return;
       }
 
       // Step 4: Prepare data and save to KV store
-      setStatusText('Preparing data ...');
+      setStatusText(t('upload.status.preparing'));
       const uuid = generateUUID();
       const data = {
         id: uuid,
@@ -86,14 +88,14 @@ const Upload = () => {
       }).unwrap();
 
       // Step 5: Analyze resume with AI
-      setStatusText('Analyzing ...');
+      setStatusText(t('upload.status.analyzing'));
       const feedbackResult = await aiFeedback({
         path: uploadedFileResult.path,
         message: prepareInstructions({ jobTitle, jobDescription }),
       }).unwrap();
 
       if (!feedbackResult) {
-        setStatusText('Error: Failed to analyze resume');
+        setStatusText(t('upload.errors.analysisFailed'));
         return;
       }
 
@@ -108,7 +110,7 @@ const Upload = () => {
         value: JSON.stringify(data),
       }).unwrap();
 
-      setStatusText('Analysis complete, redirecting ...');
+      setStatusText(t('upload.status.complete'));
       console.log(data);
       navigate(`/resume/${uuid}`);
     } catch (error) {
@@ -130,19 +132,19 @@ const Upload = () => {
 
     // Basic validation
     if (!companyName.trim()) {
-      alert('Please enter a company name');
+      alert(t('upload.errors.companyNameRequired'));
       return;
     }
     if (!jobTitle.trim()) {
-      alert('Please enter a job title');
+      alert(t('upload.errors.jobTitleRequired'));
       return;
     }
     if (!jobDescription.trim()) {
-      alert('Please enter a job description');
+      alert(t('upload.errors.jobDescriptionRequired'));
       return;
     }
     if (!file) {
-      alert('Please select a resume file');
+      alert(t('upload.errors.fileRequired'));
       return;
     }
 
@@ -154,14 +156,14 @@ const Upload = () => {
       <Navbar />
       <section className="main-section">
         <div className="page-heading py-16">
-          <h1>Smart feedback for your dream job</h1>
+          <h1>{t('upload.heading')}</h1>
           {isProcessing ? (
             <>
               <h2>{statusText}</h2>
               <img src="/images/resume-scan.gif" className="w-full" alt="Processing..." />
             </>
           ) : (
-            <h2>Drop your resume for an ATS score and improvement tips</h2>
+            <h2>{t('upload.subheading')}</h2>
           )}
           {!isProcessing && (
             <form
@@ -170,37 +172,37 @@ const Upload = () => {
               className="flex flex-col gap-4 mt-8"
             >
               <div className="form-div">
-                <label htmlFor="company-name">Company Name</label>
+                <label htmlFor="company-name">{t('upload.companyName')}</label>
                 <input
                   type="text"
                   name="company-name"
-                  placeholder="Company Name"
+                  placeholder={t('upload.companyName')}
                   id="company-name"
                   required
                 />
               </div>
               <div className="form-div">
-                <label htmlFor="job-title">Job Title</label>
+                <label htmlFor="job-title">{t('upload.jobTitle')}</label>
                 <input
                   type="text"
                   name="job-title"
-                  placeholder="Job Title"
+                  placeholder={t('upload.jobTitle')}
                   id="job-title"
                   required
                 />
               </div>
               <div className="form-div">
-                <label htmlFor="job-description">Job Description</label>
+                <label htmlFor="job-description">{t('upload.jobDescription')}</label>
                 <textarea
                   rows={5}
                   name="job-description"
-                  placeholder="Job Description"
+                  placeholder={t('upload.jobDescription')}
                   id="job-description"
                   required
                 />
               </div>
               <div className="form-div">
-                <label htmlFor="uploader">Upload Resume</label>
+                <label htmlFor="uploader">{t('upload.uploadResume')}</label>
                 <FileUploader onFileSelect={handleFileSelect} />
               </div>
 
@@ -209,7 +211,7 @@ const Upload = () => {
                 type="submit"
                 disabled={!file}
               >
-                Analyze Resume
+                {t('upload.analyzeResume')}
               </button>
             </form>
           )}

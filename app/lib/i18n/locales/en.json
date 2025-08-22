@@ -1,0 +1,117 @@
+{
+  "welcomeMessage": "Track Your Applications & Resume Ratings",
+  "navbar": {
+    "brandName": "RESUMIND",
+    "uploadResume": "Upload Resume"
+  },
+  "home": {
+    "noResumes": "No resumes found. Upload your first resume to get feedback.",
+    "reviewSubmissions": "Review your submissions and check AI-powered feedback.",
+    "uploadResumeButton": "Upload Resume"
+  },
+  "upload": {
+    "heading": "Smart feedback for your dream job",
+    "subheading": "Drop your resume for an ATS score and improvement tips",
+    "companyName": "Company Name",
+    "jobTitle": "Job Title",
+    "jobDescription": "Job Description",
+    "uploadResume": "Upload Resume",
+    "analyzeResume": "Analyze Resume",
+    "status": {
+      "uploading": "Uploading the file ...",
+      "converting": "Converting to image ...",
+      "uploadingImage": "Uploading the image ...",
+      "preparing": "Preparing data ...",
+      "analyzing": "Analyzing ...",
+      "complete": "Analysis complete, redirecting ..."
+    },
+    "errors": {
+      "uploadFailed": "Error: Failed to upload file",
+      "convertFailed": "Error: Failed to convert PDF to image",
+      "imageUploadFailed": "Error: Failed to upload image",
+      "analysisFailed": "Error: Failed to analyze resume",
+      "companyNameRequired": "Please enter a company name",
+      "jobTitleRequired": "Please enter a job title",
+      "jobDescriptionRequired": "Please enter a job description",
+      "fileRequired": "Please select a resume file"
+    }
+  },
+  "fileUploader": {
+    "dragActive": "Drop the file here ...",
+    "dragInactive": "Drag & drop a PDF file here, or click to select",
+    "remove": "Remove",
+    "clickToUpload": "Click to upload",
+    "orDragAndDrop": "or drag and drop",
+    "pdfMaxSize": "PDF (max 20 MB)"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "subtitle": "Log In To Continue Your Job Journey",
+    "signingIn": "Signing you in ...",
+    "logOut": "Log Out",
+    "logIn": "Log In",
+    "metaDescription": "Log in your account"
+  },
+  "wipe": {
+    "loading": "Loading...",
+    "error": "Error:",
+    "failedToLoad": "Failed to load files",
+    "retry": "Retry",
+    "title": "App Data Management",
+    "authenticatedAs": "Authenticated as:",
+    "existingFiles": "Existing files",
+    "noFiles": "No files found",
+    "directory": "Directory",
+    "noFilesToDelete": "No files to delete",
+    "deletingFiles": "Deleting files...",
+    "deleting": "Deleting",
+    "clearingStore": "Clearing key-value store...",
+    "refreshingList": "Refreshing file list...",
+    "wipeSuccess": "App data wiped successfully!",
+    "error": "Error:",
+    "unknownError": "Unknown error occurred",
+    "wipeAppData": "Wipe App Data",
+    "deleting": "Deleting...",
+    "refreshFiles": "Refresh Files",
+    "backToHome": "Back to Home",
+    "warningTitle": "Warning:",
+    "warningMessage": "This action will permanently delete all your uploaded files and stored data. This cannot be undone."
+  },
+  "resume": {
+    "backToHomepage": "Back to Homepage",
+    "errorLoading": "Error Loading Resume",
+    "unableToLoad": "Unable to load resume data. Please try again.",
+    "loading": "Loading...",
+    "resumePreview": "Resume preview",
+    "resumeReview": "Resume Review",
+    "metaDescription": "Detail overview of your resume"
+  },
+  "summary": {
+    "yourResumeScore": "Your Resume Score",
+    "scoreDescription": "This score is calculated based on the variables listed below.",
+    "toneAndStyle": "Tone & Style",
+    "content": "Content",
+    "structure": "Structure",
+    "skill": "Skill"
+  },
+  "ats": {
+    "atsScore": "ATS Score",
+    "question": "How well does your resume pass through Applicant Tracking Systems?",
+    "description": "Your resume was scanned like an employer would. Here's how it performed:",
+    "betterScore": "Want a better score? Improve your resume by applying the suggestions listed below."
+  },
+  "details": {
+    "toneAndStyle": "Tone & Style",
+    "content": "Content",
+    "structure": "Structure",
+    "skills": "Skills"
+  },
+  "resumeCard": {
+    "defaultTitle": "Resume"
+  },
+  "scoreBadge": {
+    "strong": "Strong",
+    "goodStart": "Good Start",
+    "needsWork": "Needs Work"
+  }
+}

@@ -6,6 +6,7 @@ import Details from "~/components/Details";
 import { useSelector } from "react-redux";
 import type { RootState } from "~/lib/store";
 import { useFsReadQuery, useKvGetQuery } from "~/lib/puterApiSlice";
+import { useTranslation } from "react-i18next";
 
 export const meta = () => [
   { title: "Resumind | Review" },
@@ -15,6 +16,7 @@ export const meta = () => [
 const Resume = () => {
   const { id } = useParams();
   const { auth } = useSelector((state: RootState) => state.puter);
+  const { t } = useTranslation();
   
   // Get resume metadata from KV store
   const { 
@@ -86,13 +88,13 @@ const Resume = () => {
           <Link to="/" className="back-button">
             <img src="/icons/back.svg" alt="logo" className="w-2.5 h-2.5" />
             <span className="text-gray-800 text-sm font-semibold">
-              Back to Homepage
+              {t('resume.backToHomepage')}
             </span>
           </Link>
         </nav>
         <div className="p-4 flex flex-col items-center justify-center min-h-[50vh]">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Resume</h2>
-          <p className="text-gray-600">Unable to load resume data. Please try again.</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-4">{t('resume.errorLoading')}</h2>
+          <p className="text-gray-600">{t('resume.unableToLoad')}</p>
         </div>
       </main>
     );
@@ -104,7 +106,7 @@ const Resume = () => {
         <button onClick={() => navigate("/")} className="back-button cursor-pointer">
           <img src="/icons/back.svg" alt="logo" className="w-2.5 h-2.5" />
           <span className="text-gray-800 text-sm font-semibold">
-            Back to Homepage
+            {t('resume.backToHomepage')}
           </span>
         </button>
       </nav>
@@ -112,7 +114,7 @@ const Resume = () => {
       {/* Loading state */}
       {(isLoadingAny || !feedback) && (
         <div className="p-4 flex flex-row justify-center">
-          <img src="/images/resume-scan-2.gif" className="w-96" alt="Loading..." />
+          <img src="/images/resume-scan-2.gif" className="w-96" alt={t('resume.loading')} />
         </div>
       )}
       
@@ -124,7 +126,7 @@ const Resume = () => {
                 <img
                   src={imageUrl}
                   className="w-full h-full object-contain rounded-2xl"
-                  alt="Resume preview"
+                  alt="{t('resume.resumePreview')}"
                 />
               </a>
             </div>
@@ -134,7 +136,7 @@ const Resume = () => {
         <section className="feedback-section">
           {feedback && (
             <>
-              <h2 className="text-4xl !text-black font-bold">Resume Review</h2>
+              <h2 className="text-4xl !text-black font-bold">{t('resume.resumeReview')}</h2>
               <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
                 <Summary feedback={feedback} />
                 <ATS

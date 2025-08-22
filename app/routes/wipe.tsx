@@ -7,12 +7,14 @@ import {
   useFsDeleteMutation,
   useKvFlushMutation,
 } from "~/lib/puterApiSlice";
+import { useTranslation } from "react-i18next";
 
 const WipeApp = () => {
   const navigate = useNavigate();
   const { auth, puterReady } = useSelector((state: RootState) => state.puter);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState("");
+  const { t } = useTranslation();
 
   // Query to load files from root directory (note: using the correct hook name from your API)
   const {
@@ -37,17 +39,17 @@ const WipeApp = () => {
 
   const handleDelete = async () => {
     if (!files.length) {
-      setDeleteStatus("No files to delete");
+      setDeleteStatus(t('wipe.noFilesToDelete'));
       return;
     }
 
     setIsDeleting(true);
-    setDeleteStatus("Deleting files...");
+    setDeleteStatus(t('wipe.deletingFiles'));
 
     try {
       // Delete all files sequentially to avoid overwhelming the system
       for (const file of files) {
-        setDeleteStatus(`Deleting ${file.name}...`);
+        setDeleteStatus(`${t('wipe.deleting')} ${file.name}...`);
         try {
           await fsDelete(file.path).unwrap();
         } catch (error) {
@@ -57,18 +59,18 @@ const WipeApp = () => {
       }
 
       // Flush KV store
-      setDeleteStatus("Clearing key-value store...");
+      setDeleteStatus(t('wipe.clearingStore'));
       await kvFlush().unwrap();
 
-      setDeleteStatus("Refreshing file list...");
+      setDeleteStatus(t('wipe.refreshingList'));
       // Refetch files to update the UI
       await refetchFiles();
 
-      setDeleteStatus("App data wiped successfully!");
+      setDeleteStatus(t('wipe.wipeSuccess'));
       setTimeout(() => setDeleteStatus(""), 3000);
     } catch (error) {
       console.error("Error during deletion:", error);
-      setDeleteStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      setDeleteStatus(`${t('wipe.error')} ${error instanceof Error ? error.message : t('wipe.unknownError')}`);
     } finally {
       setIsDeleting(false);
     }
@@ -78,7 +80,7 @@ const WipeApp = () => {
   if (!puterReady || isLoadingFiles) {
     return (
       <div className="p-8">
-        <div className="animate-pulse">Loading...</div>
+        <div className="animate-pulse">{t('wipe.loading')}</div>
       </div>
     );
   }
@@ -88,13 +90,13 @@ const WipeApp = () => {
     return (
       <div className="p-8">
         <div className="text-red-600">
-          Error: {(filesError as any)?.message || 'Failed to load files'}
+          {t('wipe.error')} {(filesError as any)?.message || t('wipe.failedToLoad')}
         </div>
         <button
           onClick={() => refetchFiles()}
           className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
         >
-          Retry
+          {t('wipe.retry')}
         </button>
       </div>
     );
@@ -103,18 +105,18 @@ const WipeApp = () => {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">App Data Management</h1>
+        <h1 className="text-2xl font-bold mb-2">{t('wipe.title')}</h1>
         <p className="text-gray-600">
-          Authenticated as: <span className="font-semibold">{auth.user?.username}</span>
+          {t('wipe.authenticatedAs')} <span className="font-semibold">{auth.user?.username}</span>
         </p>
       </div>
 
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-3">
-          Existing files ({files.length}):
+          {t('wipe.existingFiles')} ({files.length}):
         </h2>
         {files.length === 0 ? (
-          <p className="text-gray-500 italic">No files found</p>
+          <p className="text-gray-500 italic">{t('wipe.noFiles')}</p>
         ) : (
           <div className="flex flex-col gap-2 max-h-96 overflow-y-auto border rounded-md p-4">
             {files.map((file) => (
@@ -124,7 +126,7 @@ const WipeApp = () => {
                   <span className="text-sm text-gray-500">{file.path}</span>
                 </div>
                 <span className="text-xs text-gray-400">
-                  {file.size ? `${Math.round(file.size / 1024)}KB` : 'Directory'}
+                  {file.size ? `${Math.round(file.size / 1024)}KB` : t('wipe.directory')}
                 </span>
               </div>
             ))}
@@ -155,7 +157,7 @@ const WipeApp = () => {
           onClick={handleDelete}
           disabled={isDeleting || files.length === 0}
         >
-          {isDeleting ? 'Deleting...' : 'Wipe App Data'}
+          {isDeleting ? t('wipe.deleting') : t('wipe.wipeAppData')}
         </button>
 
         <button
@@ -163,14 +165,14 @@ const WipeApp = () => {
           onClick={() => refetchFiles()}
           disabled={isDeleting}
         >
-          Refresh Files
+          {t('wipe.refreshFiles')}
         </button>
 
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
           onClick={() => navigate('/')}
         >
-          Back to Home
+          {t('wipe.backToHome')}
         </button>
       </div>
 
@@ -178,7 +180,7 @@ const WipeApp = () => {
       {files.length > 0 && (
         <div className="mt-6 p-4 bg-yellow-100 border border-yellow-400 rounded-md">
           <p className="text-yellow-800 text-sm">
-            ⚠️ <strong>Warning:</strong> This action will permanently delete all your uploaded files and stored data. This cannot be undone.
+            ⚠️ <strong>{t('wipe.warningTitle')}</strong> {t('wipe.warningMessage')}
           </p>
         </div>
       )}
