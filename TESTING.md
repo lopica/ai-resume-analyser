@@ -27,9 +27,9 @@ npm run test:e2e        # Run working E2E tests (~45 seconds)
 ```
 
 **Current Status:**
-- ✅ **14/14 tests passing** across 3 test files
+- ✅ **E2E tests passing** across 5 active test files
 - ⚠️ **Auth-dependent tests disabled** (due to Puter SDK requirements)
-- 🏃 **Execution time**: ~2-3 minutes (comprehensive coverage)
+- 🏃 **Execution time**: ~45 seconds (comprehensive coverage)
 - 🔧 **Requires manual dev server**: Start `npm run dev` before running tests
 
 **What's tested:**
@@ -86,6 +86,17 @@ The following integration tests are fully functional:
 - Verifies data consistency between storage systems
 - Tests error handling and recovery
 - **6/6 tests passing**
+
+### ✅ `i18n-integration.test.tsx`
+- Tests internationalization (i18n) system integration
+- Verifies language switching functionality
+- Tests translation loading and fallbacks
+- **Integration with Redux and React Router**
+
+### ✅ `route-translations.test.tsx`
+- Tests route-based translation loading
+- Verifies language-specific content rendering
+- Tests URL parameter handling for language switching
 
 ## E2E Test Structure (Fixed & Working)
 

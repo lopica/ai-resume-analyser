@@ -32,14 +32,36 @@ This project uses a CI/CD workflow with two main branches:
 - **Unit & Integration Tests:** Must pass 100%
 - **E2E Tests:** Must pass at least 90% (allows for some flaky tests)
 
-## Available Test Scripts
+## Technology Stack
+
+### Frontend Framework
+- **React Router 7** - Full-stack React framework with SSR
+- **TypeScript** - Type safety and better developer experience
+- **TailwindCSS** - Utility-first CSS framework
+
+### State Management
+- **Redux Toolkit** - Predictable state container
+- **RTK Query** - Data fetching and caching solution
+
+### Testing
+- **Vitest** - Unit and integration testing
+- **Playwright** - End-to-end testing
+- **MSW** - API mocking for tests
+
+### Third-Party Services
+- **Puter.js** - Authentication and cloud storage
+- **AI APIs** - Resume analysis and feedback
+
+## Available Scripts
 
 ```bash
-npm run test:unit          # Run unit tests
-npm run test:integration   # Run integration tests  
-npm run test:e2e          # Run e2e tests
-npm run test:all          # Run all tests
-npm run typecheck         # Type checking
+npm run dev               # Start development server
+npm run build            # Build for production
+npm run typecheck        # Type checking
+npm run test:unit        # Run unit tests
+npm run test:integration # Run integration tests  
+npm run test:e2e         # Run e2e tests
+npm run test:all         # Run all tests
 ```
 
 ## Branch Protection
